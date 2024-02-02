@@ -1,27 +1,74 @@
-
-# Importation du module socket
 import socket
 
-# Création d'un objet socket
-serveur_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class Server:
 
-# Liaison du serveur à une adresse et un port
-adresse_serveur = ('127.0.0.1', 12345)
-serveur_socket.bind(adresse_serveur)
+    def __init__(self, _port, _ip, name: str = "host"):
+        # Infos
+        self.port = _port
+        self.ip = _ip
+        self.addr = (self.ip, self.port)
+        self.name = name
+        self.listened = 5  # Listening count
 
-# Mise en écoute du serveur (accepte jusqu'à 5 connexions en attente)
-serveur_socket.listen(5)
-print(f"Le serveur écoute sur {adresse_serveur[0]}:{adresse_serveur[1]}")
+        # Objects
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Attente de la connexion d'un client
-client_socket, client_address = serveur_socket.accept()
-print(f"Connexion établie avec {client_address}")
+    def run(self):
+        """
+        Start the server
+        """
+        self.socket.bind(self.addr)  # Liaison du serveur à un addresse
+        self.socket.listen(self.listened)  # ecoute
 
-# Envoi de données au client
-message = "Bienvenue sur le serveur!"
-client_socket.send(message.encode('utf-8'))
+    def wait_connection(self):
+        """
+        Waiting for connection and return connection's infos
 
-# Fermeture des sockets
-client_socket.close()
-serveur_socket.close()
+        :return:
+        tuple: (client_socket, client_address)
+
+        """
+        client_socket, client_address = self.socket.accept()
+        return client_socket, client_address
+
+    def send_tosocket(self, _socket, _content: str):
+        """
+        Send data to a client socket
+
+        :param _socket: the socket of target client
+        :param _content: the data to send
+        :return: none
+        """
+        _socket.send(_content.encode("utf-8"))
+
+    def close_socket(self, _socket: socket.socket):
+        """
+        Close the given socket
+
+        :param _socket: socket to close
+        :return: none
+        """
+        _socket.close()
+
+
+# Usage exemple
+if __name__ == "__main__":
+    server = Server(12345, "127.0.0.1")  # instance creation
+
+    # Starting the server
+    server.run()
+    print(f"The server is listening on {server.ip}:{server.port}")
+
+    # Waiting for connection
+    client_socket, client_address = server.wait_connection()
+    print(f"Connexion established to {client_address}")
+
+    # Sending data to the connected client
+    message = "Welcome to the server!"
+    client_socket.send(message.encode('utf-8'))
+
+    # Closing sockets
+    server.close_socket(client_socket)
+    server.close_socket(server.socket)
+    print("Server closed.")
 
