@@ -51,7 +51,7 @@ class Server:
         _socket.close()
 
 
-# Usage exemple
+# Example of usage
 if __name__ == "__main__":
     server = Server(12345, "127.0.0.1")  # instance creation
 
