@@ -5,14 +5,15 @@ if __name__ == "__main__":
     server_choice = input("Welcome !!\nYou want to be a server or a client ? (0 a server/1 b client): ")
     name = input("Your nick name: ")
 
-    if server_choice in ["0", "a", "server", "s"]:
-        ip = "localhost"
-        port = 7777
-        ip_adress = input(f"Enter your server's adress (may be your {ip}): ")
-        port_adress = input(f"Enter teh port (may be {port}): ")
+    ip = "localhost"
+    port = 7777
+    ip_adress = input(f"Enter your server's adress (may be your {ip}): ")
+    port_adress = input(f"Enter teh port (may be {port}): ")
 
-        if ip_adress != "": ip = ip_adress
-        if port_adress != "": port = int(port_adress)
+    if ip_adress != "": ip = ip_adress
+    if port_adress != "": port = int(port_adress)
+
+    if server_choice in ["0", "a", "server", "s"]:
 
         server = Server_server(port, ip, name)
         # Starting the server
@@ -31,3 +32,17 @@ if __name__ == "__main__":
         server.close_socket(client_socket)
         server.close_socket(server.socket)
         print("Server closed.")
+    if server_choice in "1 b client s".split(' '):
+        client = Client_server(port, ip)  # instance creation
+
+        # Connecting to the server
+        client.connect()
+        print(f"Connected to the server at {client.ip}:{client.port}")
+
+        # Receiving data from the server
+        data = client.get_data()
+        print(f"Received message from the server : {data.decode('utf-8')}")
+
+        # Closing sockets
+        client.close_socket(client.socket)
+        print("Connection closed.")
